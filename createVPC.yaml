@@ -1,0 +1,390 @@
+---
+- hosts: localhost
+  gather_facts: no
+  vars_files:
+    - config.yaml
+  tasks:
+    #Create VPC
+    - name: Create VPC
+      ec2_vpc_net:
+        name: "{{ vpc_name }}"
+        cidr_block: "{{ vpc_cidr_block }}"
+        region: "{{ aws_region }}"
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+        state: "present"
+        tenancy: "{{tenancy}}"
+      register: aliVPC
+
+    - name: Set VPC ID in variable
+      set_fact:
+        vpc_id: "{{ aliVPC.vpc.id }}"
+
+    #Create public Subnet 1
+    - name: Create Public Subnet 1
+      ec2_vpc_subnet:
+        state: "present"
+        vpc_id: "{{ vpc_id }}"
+        cidr: "{{ public_subnet_1_cidr }}"
+        az: "{{ az1 }}"
+        region: "{{ aws_region }}"
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+        resource_tags:
+          Name: "Public Subnet"
+      register: publicSubnet1
+
+    - name: Set Public Subnet ID in variable
+      set_fact:
+        public_subnet_id: "{{ publicSubnet1.subnet.id }}"
+
+    #Create public Subnet 2
+    - name: Create Public Subnet 2
+      ec2_vpc_subnet:
+        state: "present"
+        vpc_id: "{{ vpc_id }}"
+        cidr: "{{ public_subnet_2_cidr }}"
+        az: "{{ az2 }}"
+        region: "{{ aws_region }}"
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+        resource_tags:
+          Name: "Public Subnet B"
+      register: publicSubnet2
+
+    - name: Set Public Subnet ID in variable
+      set_fact:
+        public_subnet_id2: "{{ publicSubnet2.subnet.id }}"
+
+    #Create Private Subnet 1
+
+    - name: Create Private Subnet 1
+      ec2_vpc_subnet:
+        state: "present"
+        vpc_id: "{{ vpc_id }}"
+        cidr: "{{ private_subnet_1_cidr }}"
+        az: "{{ az1 }}"
+        region: "{{ aws_region }}"
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+        resource_tags:
+          Name: "Private Subnet 1"
+      register: privateSubnet1
+
+    - name: Set Private Subnet ID in variable
+      set_fact:
+        private_subnet_id_1: "{{ privateSubnet1.subnet.id }}"
+
+    #Create Private Subnet 2
+
+    - name: Create Private Subnet 2
+      ec2_vpc_subnet:
+        state: "present"
+        vpc_id: "{{ vpc_id }}"
+        cidr: "{{ private_subnet_2_cidr }}"
+        az: "{{ az1 }}"
+        region: "{{ aws_region }}"
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+        resource_tags:
+          Name: "Private Subnet 2"
+      register: privateSubnet2
+
+    - name: Set Private Subnet ID in variable
+      set_fact:
+        private_subnet_id_2: "{{ privateSubnet2.subnet.id }}"
+
+    #Create Private Subnet 3
+
+    - name: Create Private Subnet 3
+      ec2_vpc_subnet:
+        state: "present"
+        vpc_id: "{{ vpc_id }}"
+        cidr: "{{ private_subnet_3_cidr }}"
+        az: "{{ az1 }}"
+        region: "{{ aws_region }}"
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+        resource_tags:
+          Name: "Private Subnet 3"
+      register: privateSubnet3
+
+    - name: Set Private Subnet ID in variable
+      set_fact:
+        private_subnet_id_3: "{{ privateSubnet3.subnet.id }}"
+
+    # #Create Private Subnet 4
+
+    # - name: Create Private Subnet 4
+    #   ec2_vpc_subnet:
+    #     state: "present"
+    #     vpc_id: "{{ vpc_id }}"
+    #     cidr: "{{ private_subnet_4_cidr }}"
+    #     az: "{{ az1 }}"
+    #     region: "{{ aws_region }}"
+    #     aws_access_key: "{{ aws_access_key }}"
+    #     aws_secret_key: "{{ aws_secret_key }}"
+    #     resource_tags:
+    #       Name: "Private Subnet 4"
+    #   register: privateSubnet4
+
+    # - name: Set Private Subnet ID in variable
+    #   set_fact:
+    #     private_subnet_id_4: "{{ privateSubnet4.subnet.id }}"
+
+    # #Create Private Subnet 5
+
+    # - name: Create Private Subnet 5
+    #   ec2_vpc_subnet:
+    #     state: "present"
+    #     vpc_id: "{{ vpc_id }}"
+    #     cidr: "{{ private_subnet_5_cidr }}"
+    #     az: "{{ az1 }}"
+    #     region: "{{ aws_region }}"
+    #     aws_access_key: "{{ aws_access_key }}"
+    #     aws_secret_key: "{{ aws_secret_key }}"
+    #     resource_tags:
+    #       Name: "Private Subnet 5"
+    #   register: privateSubnet5
+
+    # - name: Set Private Subnet ID in variable
+    #   set_fact:
+    #     private_subnet_id_5: "{{ privateSubnet5.subnet.id }}"
+
+    # #Create Private Subnet 6
+
+    # - name: Create Private Subnet 6
+    #   ec2_vpc_subnet:
+    #     state: "present"
+    #     vpc_id: "{{ vpc_id }}"
+    #     cidr: "{{ private_subnet_6_cidr }}"
+    #     az: "{{ az1 }}"
+    #     region: "{{ aws_region }}"
+    #     aws_access_key: "{{ aws_access_key }}"
+    #     aws_secret_key: "{{ aws_secret_key }}"
+    #     resource_tags:
+    #       Name: "Private Subnet 6"
+    #   register: privateSubnet6
+
+    # - name: Set Private Subnet ID in variable
+    #   set_fact:
+    #     private_subnet_id_6: "{{ privateSubnet6.subnet.id }}"
+
+    #Create Internet Gateway
+    - name: Create Internet Gateway for VPC
+      ec2_vpc_igw:
+        vpc_id: "{{ vpc_id }}"
+        region: "{{ aws_region }}"
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+        state: "present"
+      register: aliVPC_igw
+
+    - name: Set Internet Gateway ID in variable
+      set_fact:
+        igw_id: "{{ aliVPC_igw.gateway_id }}"
+
+    #Create Elastic IP
+    - name: allocate a new elastic IP without associating it to anything
+      ec2_eip:
+        region: "{{ aws_region }}"
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+        in_vpc: yes
+        reuse_existing_ip_allowed: yes
+        tag_name: "{{vpc_name}} EIP IP"
+        state: present
+      register: eip
+    - debug:
+        msg: "{{eip.public_ip}}"
+
+    #Create nat gateway
+    - name: Create new nat gateway and allocate new EIP.
+      ec2_vpc_nat_gateway:
+        region: "{{ aws_region }}"
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+        state: present
+        subnet_id: "{{ public_subnet_id }}"
+        wait: yes
+        eip_address: "{{eip.public_ip}}"
+        if_exist_do_not_create: yes
+      register: my_nat_gateway
+
+    - name: Set Nat Gateway ID in variable
+      set_fact:
+        nat_gateway_id: "{{ my_nat_gateway.nat_gateway_id }}"
+
+    #Sleep for
+    - pause: seconds="{{waitTime}}"
+
+    #public subnet route table
+    - name: Set up public subnet route table
+      ec2_vpc_route_table:
+        vpc_id: "{{ vpc_id }}"
+        region: "{{ aws_region }}"
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+        tags:
+          Name: "Public"
+        subnets:
+          - "{{ public_subnet_id }}"
+          - "{{ public_subnet_id2 }}"
+        routes:
+          - dest: "0.0.0.0/0"
+            gateway_id: "{{ igw_id }}"
+
+    #private subnet route table
+    - name: Set up private subnet route table
+      ec2_vpc_route_table:
+        vpc_id: "{{ vpc_id }}"
+        region: "{{ aws_region }}"
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+        tags:
+          Name: "Private"
+        subnets:
+          - "{{ private_subnet_id_1 }}"
+          - "{{ private_subnet_id_2 }}"
+          - "{{ private_subnet_id_3 }}"
+          # - "{{ private_subnet_id_4 }}"
+          # - "{{ private_subnet_id_5 }}"
+          # - "{{ private_subnet_id_6 }}"
+        routes:
+          - dest: "0.0.0.0/0"
+            gateway_id: "{{ nat_gateway_id }}"
+      register: privateRouteTable
+
+    - name: Set Route Table ID in variable
+      set_fact:
+        privatRouteTableId: "{{ privateRouteTable.route_table.id }}"
+
+    #Create endpoint
+    - name: Create new vpc endpoint with json file
+      ec2_vpc_endpoint:
+        vpc_id: "{{ vpc_id }}"
+        region: "{{ aws_region }}"
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+        state: present
+        service: "{{service_name}}"
+        policy_file: "endPointPolicy.json"
+        wait: yes
+        route_table_ids:
+          - "{{privatRouteTableId}}"
+      register: new_vpc_endpoint
+
+    # SSH Security Groups.
+    - name: Create Main Security Group
+      ec2_group:
+        name: "Public SSH NAT"
+        description: "SSH Access Rule"
+        vpc_id: "{{ vpc_id }}"
+        region: "{{ aws_region }}"
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+        tags:
+          Name: Public SSH
+        rules:
+          - proto: "tcp"
+            from_port: "22"
+            to_port: "22"
+            cidr_ip: "{{ my_ip }}/32"
+      register: sshSG
+    - name: Set Main SG ID
+      set_fact:
+        public_nat_ssh_server_sg_id: "{{ sshSG.group_id }}"
+
+    # Private SSH Security Groups.
+    - name: Create Private Security Group
+      ec2_group:
+        name: "Private Security Group"
+        description: "Private Security Group"
+        vpc_id: "{{ vpc_id }}"
+        region: "{{ aws_region }}"
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+        tags:
+          Name: Private SSH
+        rules:
+          - proto: "tcp"
+            from_port: "22"
+            to_port: "22"
+            group_id: "{{ public_nat_ssh_server_sg_id }}"
+
+    #Public Https/Http Security Groups.
+    - name: Create Public Http/Https Security Group
+      ec2_group:
+        name: "Public Frontend HTTP HTTPS"
+        description: "Public Frontend HTTP HTTPS"
+        vpc_id: "{{ vpc_id }}"
+        region: "{{ aws_region }}"
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+        tags:
+          Name: Public Frontend
+        rules:
+          - proto: "tcp"
+            from_port: "80"
+            to_port: "80"
+            cidr_ip: "0.0.0.0/32"
+          - proto: "tcp"
+            from_port: "443"
+            to_port: "443"
+            cidr_ip: "0.0.0.0/32"
+
+    - name: create SSH Private Key
+      ec2_key:
+        name: "{{vpc_ssh_pem_file_name}}"
+        region: "{{ aws_region }}"
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+        force: false
+      register: ssh_pem_file
+
+    - name: get Private Key content
+      set_fact:
+        privatRouteTableId: "{{ ssh_pem_file.key.private_key }}"
+      when: ssh_pem_file.changed
+
+    - name: Save private key
+      copy:
+        content: "{{ privatRouteTableId }}"
+        dest: "{{vpc_ssh_pem_file_name}}"
+        mode: 0600
+      when: ssh_pem_file.changed
+
+    #SSH NAT Server
+    - name: Create SSH Nat server
+      ec2:
+        region: "{{ aws_region }}"
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+        key_name: "{{vpc_ssh_pem_file_name}}"
+        group_id: "{{public_nat_ssh_server_sg_id}}"
+        instance_type: "{{nat_ssh_serverSize}}"
+        image: "{{nat_ssh_serverImageID}}"
+        wait: yes
+        wait_timeout: 30
+        count: 1
+        instance_tags:
+          Name: nat
+        monitoring: yes
+        zone: "{{az1}}"
+        vpc_subnet_id: "{{public_subnet_id}}"
+        assign_public_ip: yes
+      register: ec2
+
+    - name: associate new elastic IPs with each of the instances
+      ec2_eip:
+        device_id: "{{ item }}"
+        region: "{{ aws_region }}"
+        aws_access_key: "{{ aws_access_key }}"
+        aws_secret_key: "{{ aws_secret_key }}"
+        in_vpc: yes
+        reuse_existing_ip_allowed: yes
+        tag_name: "{{vpc_name}} NAT EIP IP"
+        state: present
+      loop: "{{ ec2.instance_ids }}"
+    - debug:
+        msg: "SSH Nat Server IP {{eip.public_ip}}"

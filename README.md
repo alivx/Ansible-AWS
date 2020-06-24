@@ -1,6 +1,3 @@
-# Ansible-AWS
-AWS VPC with ssh nat using Ansible
-
 In this repo, you will find out how to create production secure AWS VPC using ansible.
 
 This VPC will include:
